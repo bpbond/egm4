@@ -5,7 +5,7 @@
 
 
 SCRIPTNAME		<- "egm4.R"
-INPUT_DIR		<- "./"
+INPUT_DIR		<- "sampledata/"
 OUTPUT_DIR		<- "outputs/"
 LOG_DIR			<- "logs/"
 SEPARATOR		<- "-------------------"
