@@ -119,6 +119,7 @@ compute_flux <- function( d ) {
 	Height <- 1
 	# TODO: dry mass?
 	Dry.mass <- 1
+	warning( "Currently using constant mass/area for all plots." )
 	
 	# We want to convert raw respiration (d[CO2]/dt) to a flux using
 	# A = dC/dt * V/S * Pa/RT (e.g. Steduto et al. 2002), where
@@ -132,6 +133,9 @@ compute_flux <- function( d ) {
 	#	R is universal gas constant (8.3 x 10-3 m-3 kPa mol-1 K-1)
 	#	T is air temperature (K)
 
+	# Note this is currently written for a lab incubation, computing mass-specific
+	# respiration. TODO: change to mass or area basis, user's choice.
+	
 	sleeve_diam <- 3.5			# diameter, cm
 	sleeve_ht	<- 15.2 + 2		# height, cm; extra 2 is for cap
 	egm4_vol	<- 9			# internal system volume, cm3
