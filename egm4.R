@@ -31,14 +31,6 @@ printdims <- function( d, dname=deparse( substitute( d ) ) ) {
 } # printdims
 
 # -----------------------------------------------------------------------------
-# Return matrix of memory consumption
-object.sizes <- function()
-{
-    return( rev( sort( sapply( ls( envir=.GlobalEnv ), function( object.name ) 
-        object.size( get( object.name ) ) ) ) ) )
-}
- 
-# -----------------------------------------------------------------------------
 # Save a ggplot figure
 saveplot <- function( pname, p=last_plot(), ptype=".pdf" ) {
 	stopifnot( file.exists( OUTPUT_DIR ) )
@@ -55,14 +47,6 @@ savedata <- function( df, extension=".csv" ) {
 	printlog( "Saving", fn )
 	write.csv( df, fn, row.names=F )
 } # saveplot
-
-# -----------------------------------------------------------------------------
-# Open a csv file and return data
-read_csv <- function( fn, datadir="." ) {
-	fqfn <- paste( datadir, fn, sep="/" )
-	printlog( "Opening", fqfn )
-	read.csv( fqfn, stringsAsFactors=F )
-} # read_csv
 
 # -----------------------------------------------------------------------------
 # Load requested libraries
@@ -86,6 +70,8 @@ read_egmfile <- function( fn ) {
 	stopifnot( file.exists( fqfn ) )
 	d <- read.table( fqfn, comment.char=";", sep="\t" )
 	printdims( d )
+	
+	# TODO: get these columns directly from file?
 	names( d ) <- c( "Plot", "RecNo", "Day", "Month", "Hour", "Min", "CO2_Ref", "mb_Ref",
 		 "mbR_Temp", "Input_A", "Input_B", "Input_C", "Input_D", "Input_E", "Input_F", 
 		 "Input_G", "Input_H", "ATMP", "Probe Type" )
