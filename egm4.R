@@ -1,8 +1,8 @@
-# R script to process EGM-4 data
+# egm4.R
+# R script (written using 3.0.3) to process EGM-4 data
 # BBL April 2014
 
-# Support functions and common definitions
-
+# Important variable definitions, esp. data source & destination
 
 SCRIPTNAME		<- "egm4.R"
 INPUT_DIR		<- "sampledata/"
@@ -12,6 +12,8 @@ SEPARATOR		<- "-------------------"
 
 # This is a critical variable, since seconds don't appear in the EGM4 file
 MEAS_INTERVAL	<- 10
+
+# Support functions and common definitions
 
 # -----------------------------------------------------------------------------
 # Time-stamped output function
@@ -88,10 +90,14 @@ read_egmfile <- function( fn ) {
 		 "mbR_Temp", "Input_A", "Input_B", "Input_C", "Input_D", "Input_E", "Input_F", 
 		 "Input_G", "Input_H", "ATMP", "Probe Type" )
 	d$filename <- fn
+	
+	# Seconds don't appear in the EGM-4 output, which is weird and sucks. We fill them in
+	# based on MEAS_INTERVAL (e.g. this is 5 if measurements were made every 5 secs)
 	printlog( "Adding seconds (interval =", MEAS_INTERVAL, ")" )
 	d <- ddply( d, .( Plot ), mutate, Sec=seq( from=0, length.out=length( Plot ), by=MEAS_INTERVAL ) )
 	
-	# QC
+	# Quality control
+	# TODO: improve this
 	printlog( "Computing CO2~Time R2 values for quality control..." )
 	mods <- dlply( d, .( Plot ), lm, formula = CO2_Ref ~ Sec )
 	r2 <- ldply( mods, .fun=function( x ){ round( summary( x )$r.squared, 2 ) } )
@@ -99,7 +105,7 @@ read_egmfile <- function( fn ) {
 	r2 <- r2[ order( r2$R2 ), ]
 	print( r2 )
 
-	d
+	return( d )
 } # read_egmfile
 
 # -----------------------------------------------------------------------------
@@ -163,7 +169,7 @@ sink( paste0( LOG_DIR, SCRIPTNAME, ".txt" ), split=T )
 
 printlog( "Welcome to", SCRIPTNAME )
 
-loadlibs( c( "ggplot2", "reshape", "plyr" ) )
+loadlibs( c( "ggplot2", "reshape2", "plyr" ) )
 theme_set( theme_bw() )
 
 alldata <- data.frame()
@@ -185,6 +191,11 @@ fluxes <- ddply( alldata, .( filename, Plot ), .fun=compute_flux )
 
 print( summary( fluxes ) )
 
+p <- ggplot( fluxes, aes( Plot, flux ) ) + geom_point()
+print( p )
+saveplot( "flux_summary" )
+
+printlog( SEPARATOR )
 printlog( "Saving flux data..." )
 savedata( alldata )
 printlog( "Saving flux data..." )
