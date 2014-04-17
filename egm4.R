@@ -214,7 +214,7 @@ loadlibs( c( "ggplot2", "reshape2", "plyr" ) )
 theme_set( theme_bw() )
 
 alldata <- data.frame()
-filelist <- list.files( path=INPUT_DIR, pattern="dat$" )
+filelist <- list.files( path=INPUT_DIR, pattern="dat$", recursive=T )
 for( fn in filelist ) {
 	printlog( SEPARATOR )
 	alldata <- rbind( alldata, read_egmfile( fn ) )
