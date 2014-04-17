@@ -2,12 +2,19 @@
 # R script (written using 3.0.3) to process EGM-4 data
 # BBL April 2014
 
+# IMPORTANT: see the NOTEs below
+
 # Important variable definitions, esp. data source & destination
 
 SCRIPTNAME		<- "egm4.R"
 INPUT_DIR		<- "sampledata/"
+PLOTDATA		<- "sampledata/plotdata.csv"
 OUTPUT_DIR		<- "outputs/"
 LOG_DIR			<- "logs/"
+
+SYSTEM_VOLUME	<- 15.15 / 100^3		# m^3
+CHAMBER_AREA	<- 5.5					# cm^2
+
 SEPARATOR		<- "-------------------"
 
 # This is a critical variable, since seconds don't appear in the EGM4 file
@@ -47,6 +54,15 @@ savedata <- function( df, extension=".csv" ) {
 	printlog( "Saving", fn )
 	write.csv( df, fn, row.names=F )
 } # saveplot
+
+# -----------------------------------------------------------------------------
+# Open a csv file and return data
+read_csv <- function( fn, datadir="." ) {
+	fqfn <- paste( datadir, fn, sep="/" )
+	printlog( "Opening", fqfn )
+	stopifnot( file.exists( fqfn ) )
+	read.csv( fqfn, stringsAsFactors=F )
+} # read_csv
 
 # -----------------------------------------------------------------------------
 # Load requested libraries
@@ -94,6 +110,26 @@ read_egmfile <- function( fn ) {
 	return( d )
 } # read_egmfile
 
+
+# -----------------------------------------------------------------------------
+# read plot data, if it exists, and merge with EGM4 data
+read_plotdata <- function( fn=PLOTDATA ) {
+	d <- NULL
+	if( file.exists( fn ) ) {
+		d <- read_csv( fn )
+		if( any( names( d )=="Plot" ) ) {
+			printlog( "Plot data read OK" )
+		} else {
+			printlog( "Plot data file read, but no 'Plot' field!" )
+			warning( "No plot field!" )
+		}
+	} else {
+		printlog( "Plot data file", fn, "not found" )
+	}
+	
+	return( d )
+}
+
 # -----------------------------------------------------------------------------
 # compute fluxes
 compute_flux <- function( d ) {
@@ -101,43 +137,41 @@ compute_flux <- function( d ) {
 	m <- lm( CO2_Ref ~ Sec, data=d )
 	Resp_raw <- as.numeric( coef( m )[ 2 ] )	# i.e. the slope
 	
-	# TODO: height?
-	Height <- 1
-	# TODO: dry mass?
-	Dry.mass <- 1
-	warning( "Currently using constant mass/area for all plots." )
-	
 	# We want to convert raw respiration (d[CO2]/dt) to a flux using
 	# A = dC/dt * V/S * Pa/RT (e.g. Steduto et al. 2002), where
 	# 	A is CO2 flux (umol/m2/s)
 	#	dC/dt is raw respiration as above (mole fraction/s)
 	# 	V is total chamber volume (m3)
-	#		...we are correcting for varying headspaces in the cores
-	#	S is ground surface area (m2)
-	#		...but we're computing per kg of soil, so using dry mass instead
+	#		...correcting for varying headspaces in the cores, if applicable
+	#	S is ground surface area (m2), if applicable
+	# 	M is sample dry mass (g), if applicable
 	#	Pa is atmospheric pressure (kPa)
 	#	R is universal gas constant (8.3 x 10-3 m-3 kPa mol-1 K-1)
 	#	T is air temperature (K)
 
-	# Note this is currently written for a lab incubation, computing mass-specific
-	# respiration. TODO: change to mass or area basis, user's choice.
+	S 			<- CHAMBER_AREA		# note cm2, not m2!
+	if( any( names( d )=="Area" ) ) {
+		 S <- d$Area
+	}
+	V 			<- SYSTEM_VOLUME
+	if( any( names( d )=="Volume" ) ) {
+		V <- V + d$Volume
+	}
+	M 			<- 1.0
+	if( any( names( d )=="Mass" ) ) {
+		 M <- d$Mass
+	}
 	
-	sleeve_diam <- 3.5			# diameter, cm
-	sleeve_ht	<- 15.2 + 2		# height, cm; extra 2 is for cap
-	egm4_vol	<- 9			# internal system volume, cm3
-	lines_vol 	<- ( 1/8 * 2.54 / 2 ) ^2 * 122 * 2	# two 122-cm 1/8" lines, cm3
-	S 			<- ( sleeve_diam / 2 ) * pi	# note cm2, not m2!
-	sleeve_vol <- ( sleeve_ht - Height ) * S
-	V	<- ( egm4_vol + lines_vol + sleeve_vol ) / 100^3		# m3
-	Pa 			<- 101						# kPa				(Richland is ~120 m asl)
+	Pa 			<- 101						# kPa
 	R 			<- 8.3e-3					# m-3 kPa mol-1 K-1
 
 	Tair <- mean( d$Input_C )		# assumes EGM temperature probe connected
 	
-	# Calculate mass-corrected respiration, umol/g soil/s
-	Resp_mass <- Resp_raw * V/Dry.mass * Pa/( R*( 273.1+Tair ) )
+	# Calculate mass- (or area-) corrected respiration, umol/g soil/s or umol/cm2/s
+	Resp_mass <- Resp_raw * V/S/M * Pa/( R*( 273.1+Tair ) )
 
-	# Convert from umol/g soil/s to mgC/kg soil/day
+	# Convert from umol/g soil/s to mgC/kg soil/day or whatever
+	# NOTE: you probably want to change this line for your specific setup
 	flux <- Resp_mass / 1e6 * 12 * 1000 * 1000 * 60 * 60 * 24
 
 	return( c( Tair=Tair, V=V, S=S, Day=mean( d$Day ), Month=mean( d$Month ), N=nrow( d ), flux=flux ) )
@@ -163,7 +197,7 @@ loadlibs( c( "ggplot2", "reshape2", "plyr" ) )
 theme_set( theme_bw() )
 
 alldata <- data.frame()
-filelist <- list.files( path=INPUT_DIR, pattern="*.dat" )
+filelist <- list.files( path=INPUT_DIR, pattern="dat$" )
 for( fn in filelist ) {
 	printlog( SEPARATOR )
 	alldata <- rbind( alldata, read_egmfile( fn ) )
@@ -173,8 +207,9 @@ printlog( SEPARATOR )
 printlog( "All done reading data." )
 printdims( alldata )
 
+plotdata <- read_plotdata()
 printlog( "Merging respiration data with dry mass data..." )
-# TODO
+alldata <- merge( plotdata, alldata )
 
 printlog( "Computing fluxes..." )
 fluxes <- ddply( alldata, .( filename, Plot ), .fun=compute_flux )
