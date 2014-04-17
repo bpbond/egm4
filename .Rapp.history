@@ -1,0 +1,173 @@
+source("egm4.R")
+printdims(fluxes)
+head(fluxes)
+qplot(Plot,flux,data=fluxes)
+source("egm4.R")
+ls()
+warnings()
+head(alldata)
+names(d)
+names(alldata)
+?any
+any(names(alldata="Plot"))
+any(names(alldata)=="Plot")
+unique(alldata$Plot)
+d <- data.frame(Plot=unique(alldata$Plot),Mass=1,Area=1)
+d
+d$Volume <- 0
+d
+write.csv(d,'sampledata/plotdata.csv',row.names=F)
+source("egm4.R")
+names(alldata)
+names(alldata)=="Plot"
+any(names(alldata)=="Plot")
+names(alldata)=="Plot"
+source("egm4.R")
+d <- read.csv("sampledata/plotdata.csv")
+d
+names(d)
+if( any( names( d )=="Plot" ) ) {#
+			printlog( "Plot data read OK" )#
+		} else {#
+			printlog( "** Plot data file read, but no 'Plot' field!" )#
+			warning( "No plot field!" )#
+		}
+exists(d)
+?exists
+exists("d")
+exists("d"# -----------------------------------------------------------------------------#
+# read plot data, if it exists, and merge with EGM4 data#
+read_plotdata <- function( fn=PLOTDATA ) {#
+	d <- NULL#
+	if( file.exists( fn ) ) {#
+		d <- read_csv( fn )#
+		if( any( names( d )=="Plot" ) ) {#
+			printlog( "Plot data read OK" )#
+		} else {#
+			printlog( "Plot data file read, but no 'Plot' field!" )#
+			warning( "No plot field!" )#
+		}#
+	} else {#
+		printlog( "Plot data file", fn, "not found" )#
+	}#
+	return( d )#
+}#
+)
+# -----------------------------------------------------------------------------#
+# read plot data, if it exists, and merge with EGM4 data#
+read_plotdata <- function( fn=PLOTDATA ) {#
+	d <- NULL#
+	if( file.exists( fn ) ) {#
+		d <- read_csv( fn )#
+		if( any( names( d )=="Plot" ) ) {#
+			printlog( "Plot data read OK" )#
+		} else {#
+			printlog( "Plot data file read, but no 'Plot' field!" )#
+			warning( "No plot field!" )#
+		}#
+	} else {#
+		printlog( "Plot data file", fn, "not found" )#
+	}#
+	return( d )#
+}
+read_plotdata()
+source("egm4.R")
+read_plotdata()
+plotdata <- read_plotdata()
+plotdata
+source("egm4.R")
+filelist
+list.files( path=INPUT_DIR, pattern="*.dat" )
+?list.files
+list.files( path=INPUT_DIR, pattern=".dat" )
+list.files( path=INPUT_DIR, pattern="dat" )
+list.files( path=INPUT_DIR, pattern="dat$" )
+source("egm4.R")
+?merge
+source("egm4.R")
+head(alldata)
+source('egm4.R')
+head(alldata)
+sleeve_diam <- 3.5			# diameter, cm#
+	sleeve_ht	<- 15.2 + 2		# height, cm; extra 2 is for cap#
+	egm4_vol	<- 9			# internal system volume, cm3#
+	lines_vol 	<- ( 1/8 * 2.54 / 2 ) ^2 * 122 * 2	# two 122-cm 1/8" lines, cm3#
+	S 			<- ( sleeve_diam / 2 ) * pi	# note cm2, not m2!#
+	sleeve_vol <- ( sleeve_ht - Height ) * S#
+#	V	<- ( egm4_vol + lines_vol + sleeve_vol ) / 100^3		# m3
+sleeve_diam <- 3.5			# diameter, cm#
+	sleeve_ht	<- 15.2 + 2		# height, cm; extra 2 is for cap#
+	egm4_vol	<- 9			# internal system volume, cm3#
+	lines_vol 	<- ( 1/8 * 2.54 / 2 ) ^2 * 122 * 2	# two 122-cm 1/8" lines, cm3#
+	S 			<- ( sleeve_diam / 2 ) * pi	# note cm2, not m2!#
+	V	<- ( egm4_vol + lines_vol + sleeve_vol ) / 100^3		# m3
+sleeve_diam <- 3.5			# diameter, cm#
+	sleeve_ht	<- 15.2 + 2		# height, cm; extra 2 is for cap#
+	egm4_vol	<- 9			# internal system volume, cm3#
+	lines_vol 	<- ( 1/8 * 2.54 / 2 ) ^2 * 122 * 2	# two 122-cm 1/8" lines, cm3#
+	S 			<- ( sleeve_diam / 2 ) * pi	# note cm2, not m2!#
+	V	<- ( egm4_vol + lines_vol ) / 100^3		# m3
+V
+V * 100^3
+S
+plotdata
+source("egm4.R")
+source("egm4.R")
+names(d)
+?names
+source("egm4.R")
+head(alldata)
+fluxes <- ddply( alldata, .( filename, Plot ), .fun=compute_flux )
+source("egm4.R")
+source("egm4.R")
+?options
+options(error=recover)
+source("egm4.R")
+debug(compute_flux)
+source('egm4.R')
+source('egm4.R')
+Tair
+Q
+source('egm4.R')
+Tair
+flux
+0
+0
+source()
+sink()
+sink()
+0
+0
+sink()
+sink()
+sink()
+sink()
+sink()
+sink()
+sink()
+sink()
+source("egm4.R")
+sink()
+source("egm4.R")
+0
+source("egm4.R")
+fluxes
+alldata
+qplot(Sec,CO2_Ref,data=alldata,geom="line",color=Plot)
+qplot(Sec,CO2_Ref,data=alldata,geom="line",color=Plot,facets=Day~.)
+qplot(Sec,CO2_Ref,data=alldata,color=Plot,facets=Day~.)
+qplot(Sec,CO2_Ref,data=alldata,color=Plot,facets=Day~.)+geom_smooth()
+qplot(Sec,CO2_Ref,data=alldata,color=Plot,facets=Day~.)+geom_smooth(method='lm')
+qplot(Sec,CO2_Ref,data=alldata,group=Plot,color=Plot,facets=Day~.)+geom_smooth(method='lm')
+source("egm4.R")
+qplot(Dayp <- ggplot( fluxes, aes( Day, flux, color=Plot ) ) + geom_point()#
+)
+p <- ggplot( fluxes, aes( Day, flux, color=Plot ) ) + geom_point()
+p
+p <- ggplot( fluxes, aes( Day, flux, color=Plot ) ) + geom_point()+geom_line()
+p
+p <- ggplot( fluxes, aes( Day, flux, group=Plot,color=Plot ) ) + geom_point()+geom_line()
+p
+source("egm4.R")
+sink()
+sink()
