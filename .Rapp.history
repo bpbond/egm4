@@ -112,19 +112,16 @@ V * 100^3
 S
 plotdata
 source("egm4.R")
-source("egm4.R")
 names(d)
 ?names
 source("egm4.R")
 head(alldata)
 fluxes <- ddply( alldata, .( filename, Plot ), .fun=compute_flux )
 source("egm4.R")
-source("egm4.R")
 ?options
 options(error=recover)
 source("egm4.R")
 debug(compute_flux)
-source('egm4.R')
 source('egm4.R')
 Tair
 Q
@@ -132,19 +129,9 @@ source('egm4.R')
 Tair
 flux
 0
-0
 source()
 sink()
-sink()
 0
-0
-sink()
-sink()
-sink()
-sink()
-sink()
-sink()
-sink()
 sink()
 source("egm4.R")
 sink()
@@ -170,4 +157,4 @@ p <- ggplot( fluxes, aes( Day, flux, group=Plot,color=Plot ) ) + geom_point()+ge
 p
 source("egm4.R")
 sink()
-sink()
+?list.files

@@ -14,9 +14,9 @@
 
 # Important variable definitions, esp. data source & destination
 SCRIPTNAME		<- "egm4.R"
-INPUT_DIR		<- "sampledata/"
-OUTPUT_DIR		<- "outputs/"
-LOG_DIR			<- "logs/"
+INPUT_DIR		<- "sampledata"  # directory names shouldn't end with / (Windows)
+OUTPUT_DIR		<- "outputs"
+LOG_DIR			<- "logs"
 
 # The optional PLOTDATA file *must* have a 'Plot' field
 # It *may* have 'Mass' and/or 'Area' fields, which will be divided into the computed flux
@@ -93,7 +93,7 @@ loadlibs <- function( liblist ) {
 # -----------------------------------------------------------------------------
 # read a process a single EGM4 output file, returning data frame
 read_egmfile <- function( fn ) {
-	fqfn <- paste0( INPUT_DIR, fn )
+	fqfn <- paste0( INPUT_DIR, "/", fn )
 	printlog( "Reading", fqfn )
 	stopifnot( file.exists( fqfn ) )
 	d <- read.table( fqfn, comment.char=";", sep="\t" )
@@ -123,7 +123,10 @@ read_egmfile <- function( fn ) {
 	names( r2 ) <- c( "Plot", "R2" )
 	r2 <- r2[ order( r2$R2 ), ]
 	print( r2 )
-
+    
+#	p <- qplot( factor( Plot ), R2, geom="bar", data=r2, stat="identity" )
+#    saveplot( "r2_values", p ) 
+    
 	return( d )
 } # read_egmfile
 
@@ -206,7 +209,7 @@ if( !file.exists( LOG_DIR ) ) {
 	dir.create( LOG_DIR )
 }
 
-sink( paste0( LOG_DIR, SCRIPTNAME, ".txt" ), split=T )
+sink( paste( LOG_DIR, paste0( SCRIPTNAME, ".txt" ), sep="/" ), split=T )
 
 printlog( "Welcome to", SCRIPTNAME )
 
@@ -215,6 +218,7 @@ theme_set( theme_bw() )
 
 alldata <- data.frame()
 filelist <- list.files( path=INPUT_DIR, pattern="dat$", recursive=T )
+printlog( "We have", length( filelist ), "files to process" )
 for( fn in filelist ) {
 	printlog( SEPARATOR )
 	alldata <- rbind( alldata, read_egmfile( fn ) )
@@ -232,12 +236,17 @@ if( !is.null( plotdata ) ) {
 
 printlog( "Computing fluxes..." )
 fluxes <- ddply( alldata, .( filename, Plot ), .fun=compute_flux )
+fluxes$Plot <- as.factor( fluxes$Plot )
 
 print( summary( fluxes ) )
 
 p <- ggplot( fluxes, aes( Day, flux, group=Plot, colour=Plot ) ) + geom_point() + geom_line()
 print( p )
 saveplot( "flux_summary" )
+
+p <- ggplot( fluxes, aes( Day, flux ) ) + geom_line() + facet_wrap( ~Plot, nrow=6, ncol=6 )
+print( p )
+saveplot( "flux_summary2" )
 
 printlog( SEPARATOR )
 printlog( "Saving flux data..." )
