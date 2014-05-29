@@ -198,7 +198,9 @@ printlog(nrow(d),length(flux))
 }
 
 # ==============================================================================
-# Main
+# 										Main
+# ==============================================================================
+
 INPUT_DIR <- normalizePath( INPUT_DIR )
 OUTPUT_DIR <- normalizePath( OUTPUT_DIR )
 if( !file.exists( OUTPUT_DIR ) ) {
