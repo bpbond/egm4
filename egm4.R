@@ -70,7 +70,7 @@ savedata <- function( df, extension=".csv" ) {
 # -----------------------------------------------------------------------------
 # Open a csv file and return data
 read_csv <- function( fn, datadir="." ) {
-	fqfn <- paste( datadir, fn, sep="/" )
+	fqfn <- paste( normalizePath( datadir ), fn, sep="/" )
 	printlog( "Opening", fqfn )
 	stopifnot( file.exists( fqfn ) )
 	read.csv( fqfn, stringsAsFactors=F )
@@ -92,8 +92,8 @@ loadlibs <- function( liblist ) {
 
 # -----------------------------------------------------------------------------
 # read a process a single EGM4 output file, returning data frame
-read_egmfile <- function( fn ) {
-	fqfn <- paste0( INPUT_DIR, "/", fn )
+read_egmfile <- function( fn, input_dir=INPUT_DIR ) {
+	fqfn <- paste0( normalizePath( input_dir ), "/", fn )
 	printlog( "Reading", fqfn )
 	stopifnot( file.exists( fqfn ) )
 	d <- read.table( fqfn, comment.char=";", sep="\t" )
@@ -199,11 +199,13 @@ printlog(nrow(d),length(flux))
 
 # ==============================================================================
 # Main
-
+INPUT_DIR <- normalizePath( INPUT_DIR )
+OUTPUT_DIR <- normalizePath( OUTPUT_DIR )
 if( !file.exists( OUTPUT_DIR ) ) {
 	printlog( "Creating", OUTPUT_DIR )
 	dir.create( OUTPUT_DIR )
 }
+LOG_DIR <- normalizePath( LOG_DIR )
 if( !file.exists( LOG_DIR ) ) {
 	printlog( "Creating", LOG_DIR )
 	dir.create( LOG_DIR )
