@@ -232,15 +232,15 @@ printlog( SEPARATOR )
 printlog( "All done reading data." )
 printdims( alldata )
 
-plotdata <- read_plotdata()
-if( !is.null( plotdata ) ) {
-	printlog( "Merging respiration data with dry mass data..." )
-	alldata <- merge( plotdata, alldata )
-}
-
 printlog( "Computing fluxes..." )
 fluxes <- ddply( alldata, .( filename, Plot ), .fun=compute_flux )
 fluxes$Plot <- as.factor( fluxes$Plot )
+
+plotdata <- read_plotdata()
+if( !is.null( plotdata ) ) {
+	printlog( "Merging respiration data with dry mass data..." )
+	fluxes <- merge( plotdata, fluxes )
+}
 
 print( summary( fluxes ) )
 

@@ -158,3 +158,4 @@ p
 source("egm4.R")
 sink()
 ?list.files
+?normalizePath
