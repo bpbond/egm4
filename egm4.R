@@ -1,5 +1,5 @@
 # egm4.R
-# R script (written using 3.0.3) to process EGM-4 data
+# R script (written using 3.1.0) to process EGM-4 data
 # BBL April 2014
 
 # To use:
